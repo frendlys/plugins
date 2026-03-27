@@ -32,6 +32,10 @@
     >
       <slot name="custom-refresh-header"></slot>
     </view>
+    <!-- 自定义广告位 -->
+    <view class="virtual-list-header">
+      <slot name="header"></slot>
+    </view>
     <!-- 占位容器，撑开滚动区域 -->
     <view
       class="virtual-list-placeholder"
@@ -41,7 +45,7 @@
     <!-- 实际渲染的列表项 -->
     <view
       class="virtual-list-content"
-      :style="{ transform: `translateY(${offsetY}px)` }"
+      :style="{ transform: `translateY(${offsetY + headerHeight}px)` }"
     >
       <view
         v-for="(item, index) in visibleData"
@@ -137,6 +141,7 @@ const endIndex = ref(0);
 const offsetY = ref(0);
 const visibleData = ref<any[]>([]);
 const containerHeight = ref(0);
+const headerHeight = ref(0);
 const instance = getCurrentInstance();
 
 const itemHeight = computed(() => props.itemHeight);
@@ -150,8 +155,13 @@ const refresherTriggered = computed(() => props.refresherTriggered);
 const updateVisibleData = (scrollTopValue = 0) => {
   const itemH = itemHeight.value;
   if (!itemH || itemH <= 0) return;
-  const start = Math.floor(scrollTopValue / itemH);
-  const visibleCount = Math.ceil(containerHeight.value / itemH);
+  const listScrollTop = Math.max(0, scrollTopValue - headerHeight.value);
+  const availableHeight = Math.max(
+    1,
+    containerHeight.value - headerHeight.value
+  );
+  const start = Math.floor(listScrollTop / itemH);
+  const visibleCount = Math.ceil(availableHeight / itemH);
   const safeVisibleCount = visibleCount > 0 ? visibleCount : 1;
   const end = Math.min(
     start + safeVisibleCount + props.bufferSize,
@@ -175,9 +185,13 @@ const getContainerHeight = () => {
   const query = uni.createSelectorQuery().in(instance.proxy);
   query
     .select(".custom-virtual-list")
-    .boundingClientRect((rect: { height?: number } | null) => {
-      if (!rect || !rect.height) return;
-      containerHeight.value = rect.height;
+    .boundingClientRect((containerRect: { height?: number } | null) => {
+      if (!containerRect || !containerRect.height) return;
+      containerHeight.value = containerRect.height;
+    })
+    .select(".virtual-list-header")
+    .boundingClientRect((headerRect: { height?: number } | null) => {
+      headerHeight.value = Number(headerRect?.height || 0);
       updateVisibleData(Number(props.scrollTop || 0));
     })
     .exec();
@@ -242,6 +256,10 @@ onMounted(() => {
   }
 
   .virtual-list-placeholder {
+    width: 100%;
+  }
+
+  .virtual-list-header {
     width: 100%;
   }
 
