@@ -79,7 +79,7 @@ import {
   ref,
   watch,
 } from "vue";
-import { useIntersectionLoadMore } from "@/hooks/useIntersectionLoadMore";
+import { useIntersectionLoadMore } from "@/hooks/useIntersectionLoadMore";//注意：修改自定义hook路径
 
 interface VisibleChangePayload<T = any> {
   startIndex: number;
