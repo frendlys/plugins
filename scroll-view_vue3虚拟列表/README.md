@@ -44,7 +44,9 @@ export default {
 
   ##广告位，一般首页存在广告位且参与滚动，但又不能影响虚拟列表的滚动，可以将广告位插入到虚拟列表中顶部，虚拟列表滚动区中除去广告位部分，请使用header插槽
   <template #header>
-    <slot name="header"></slot>
+    <view class="advertising">
+         自定义广告      
+    </view>
   </template>
 
   <template v-slot="{ item, index }">
