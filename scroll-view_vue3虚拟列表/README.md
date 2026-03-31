@@ -52,6 +52,16 @@ export default {
       <text>{{ index + 1 }}. {{ item.title }}</text>
     </view>
   </template>
+
+  ## 自定义触底加载动画使用 #footer 插槽
+   <template #footer>
+    <uni-load-more
+       iconType="circle"
+       :status="isLoadMore"
+       :iconSize="15"
+       :content-text="contentText"
+     />
+   </template>
 </virtual-list>
 ```
 
